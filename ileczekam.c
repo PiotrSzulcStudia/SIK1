@@ -96,7 +96,7 @@ void test_udp_connection(char *hostname, const int port)
     printf("%" PRId64 "\n", GetTimeStamp());
     printf("%d\n", sizeof(uint64_t));
     
-    uint64_t curtime = htons(GetTimeStamp());
+    uint64_t curtime = htonl(GetTimeStamp());
     snd_len = sendto(sock, &curtime, sizeof(uint64_t), sflags, (struct sockaddr *) &my_address, rcva_len);
     if (snd_len != (ssize_t) sizeof(uint64_t)) {
       syserr("partial / failed write");
