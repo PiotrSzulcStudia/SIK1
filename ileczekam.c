@@ -31,7 +31,6 @@ uint64_t GetTimeStamp() {
 int main(int argc, char *argv[])
 {   
     
-    
     int i;
     ssize_t len, rcv_len;
     
@@ -54,6 +53,10 @@ void test_udp_connection(char *hostname, const int port)
     
     int i, flags, sflags;
     char buffer[BUFFER_SIZE];
+    
+    
+    /* hello */
+    
     size_t len;
     ssize_t snd_len, rcv_len;
     struct sockaddr_in my_address;
@@ -91,9 +94,11 @@ void test_udp_connection(char *hostname, const int port)
     rcva_len = (socklen_t) sizeof(my_address);
     
     printf("%" PRId64 "\n", GetTimeStamp());
+    printf("%d\n", sizeof(uint64_t));
     
-    snd_len = sendto(sock, "FSD", len, sflags, (struct sockaddr *) &my_address, rcva_len);
-    if (snd_len != (ssize_t) len) {
+    uint64_t curtime = GetTimeStamp();
+    snd_len = sendto(sock, curtime, sizeof(curtime), sflags, (struct sockaddr *) &my_address, rcva_len);
+    if (snd_len != (ssize_t) sizeof(uint64_t)) {
       syserr("partial / failed write");
     }
     
