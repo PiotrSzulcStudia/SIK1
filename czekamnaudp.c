@@ -2,6 +2,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <inttypes.h>
@@ -56,6 +57,7 @@ int main(int argc, char *argv[]) {
 				syserr("error on datagram from client socket");
 			else {
 				(void) printf("%" PRId64 "\n", curtime);
+				//(void) printf("%" PRId64 "\n", be64toh(curtime));
 				(void) printf("read from socket: %zd bytes: %.*s\n", len,
 						(int) len, buffer);
 				
