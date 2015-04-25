@@ -96,13 +96,23 @@ void test_udp_connection(char *hostname, const int port)
     printf("%" PRId64 "\n", GetTimeStamp());
     printf("%d\n", sizeof(uint64_t));
     
-    uint64_t curtime = GetTimeStamp();
-    snd_len = sendto(sock, curtime, sizeof(curtime), sflags, (struct sockaddr *) &my_address, rcva_len);
+    uint64_t curtime = htons(GetTimeStamp());
+    snd_len = sendto(sock, &curtime, sizeof(uint64_t), sflags, (struct sockaddr *) &my_address, rcva_len);
     if (snd_len != (ssize_t) sizeof(uint64_t)) {
       syserr("partial / failed write");
     }
     
-    
+    (void) memset(buffer, 0, sizeof(buffer));
+    flags = 0;
+    len = (size_t) sizeof(buffer) - 1;
+    rcva_len = (socklen_t) sizeof(srvr_address);
+    rcv_len = recvfrom(sock, buffer, len, flags,
+        (struct sockaddr *) &srvr_address, &rcva_len);
+
+    if (rcv_len < 0) {
+      syserr("read");
+    }
+    (void) printf("read from socket: %zd bytes: %s\n", rcv_len, buffer);
     
     
     
