@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include "err.h"
 
@@ -20,6 +21,12 @@ const char* usage_error = "Usage: $./ileczekam -<connection_type: u, t> <hostnam
 
 void test_tcp_connection(char *hostname, const int port);
 void test_udp_connection(char *hostname, const int port);
+
+uint64_t GetTimeStamp() {
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    return tv.tv_sec*(uint64_t)1000000+tv.tv_usec;
+}
 
 int main(int argc, char *argv[])
 {   
@@ -80,6 +87,19 @@ void test_udp_connection(char *hostname, const int port)
 	syserr("socket");
     
     /* code */
+    sflags = 0;
+    rcva_len = (socklen_t) sizeof(my_address);
+    
+    printf("%" PRId64 "\n", GetTimeStamp());
+    
+    snd_len = sendto(sock, "FSD", len, sflags, (struct sockaddr *) &my_address, rcva_len);
+    if (snd_len != (ssize_t) len) {
+      syserr("partial / failed write");
+    }
+    
+    
+    
+    
     
     if (close(sock) == -1)
 	syserr("close");
