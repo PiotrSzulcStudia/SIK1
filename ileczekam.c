@@ -19,28 +19,25 @@
 static const char* usage_error = "Usage: $./ileczekam -<connection_type: u, t> <hostname> <port>";
 
 void safe_atoi(char * str);
-void test_tcp_connection(char *hostname, const int port);
+void test_tcp_connection(char *hostname, char *port);
 void test_udp_connection(char *hostname, const int port);
 
 int main(int argc, char *argv[])
 {   
-    int port;
-    
     if (argc != 4)
         fatal(usage_error);
-    port = atoi(argv[ARG_PORT]);
     
     if (strcmp(argv[ARG_CONNECTION], "-u") == 0)
-	test_udp_connection(argv[ARG_HOSTNAME], port);
+	test_udp_connection(argv[ARG_HOSTNAME], atoi(argv[ARG_PORT]));
     else if (strcmp(argv[ARG_CONNECTION], "-t") == 0)
-	test_tcp_connection(argv[ARG_HOSTNAME], port);
+	test_tcp_connection(argv[ARG_HOSTNAME], argv[ARG_PORT]);
     else
 	fatal(usage_error);
     
     return 0;
 }
 
-void test_tcp_connection(char *hostname, const int port)
+void test_tcp_connection(char *hostname, char *port)
 {
     int sock;
     struct addrinfo addr_hints;
@@ -142,8 +139,8 @@ void test_udp_connection(char *hostname, const int port)
     (void) printf("read from socket: %zd bytes\n", rcv_len);
     (void) fprintf(stderr, "read from socket: %zd bytes: %s\n", rcv_len, buffer);
     
-    PrintTimeStamp("sendto", start_time);
-    PrintTimeStamp("reply", end_time);
+    PrintTimeStamp("sendto", start_time); // outputs to stderr
+    PrintTimeStamp("reply", end_time);    // outputs to stderr
     PrintTimeDiff(start_time, end_time);
     
     if (close(sock) == -1)

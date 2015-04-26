@@ -56,15 +56,15 @@ int main(int argc, char *argv[]) {
 			len = recvfrom(sock, &message, sizeof(message), flags,
 					(struct sockaddr *) &client_address, &rcva_len);
 			int64_t current_time = GetTimeStamp();
-			int64_t recieved_time = be64toh(message);
+			int64_t received_time = be64toh(message);
 			
 			PrintTimeStamp("message arival", current_time);
 			
 			if (len < 0)
 				syserr("error on datagram from client socket");
 			else {
-				(void) printf("read from socket: %zd bytes: %" PRId64 "\n", len, recieved_time);
-				sprintf(buffer, "%" PRId64 " %" PRId64"\0", recieved_time, current_time); // no buffer overflow
+				(void) printf("read from socket: %zd bytes: %" PRId64 "\n", len, received_time);
+				sprintf(buffer, "%" PRId64 " %" PRId64"\0", received_time, current_time); // no buffer overflow
 				(void) fprintf(stderr, "sending to client: %s\n", buffer);
 				sflags = 0;
 				snd_len = sendto(sock, buffer, (size_t) strlen(buffer), sflags,
