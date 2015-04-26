@@ -7,7 +7,8 @@
 #include <inttypes.h>
 
 uint64_t GetTimeStamp();
-void PrintTime(uint64_t t);
 void PrintTimeDiff(uint64_t t1, uint64_t t2);
 
+/* output to stderr */
+void PrintTimeStamp(char *action, uint64_t t);
 #endif

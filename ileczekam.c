@@ -77,7 +77,6 @@ void test_tcp_connection(char *hostname, const int port)
 
 void test_udp_connection(char *hostname, const int port)
 {
-    printf("%d", port);
     int sock;
     struct addrinfo addr_hints;
     struct addrinfo *addr_result;
@@ -136,12 +135,15 @@ void test_udp_connection(char *hostname, const int port)
 
     /* Stoping timer */
     uint64_t end_time = GetTimeStamp();
-
+   
     if (rcv_len < 0)
 	syserr("read");
     
     (void) printf("read from socket: %zd bytes\n", rcv_len);
     (void) fprintf(stderr, "read from socket: %zd bytes: %s\n", rcv_len, buffer);
+    
+    PrintTimeStamp("sendto", start_time);
+    PrintTimeStamp("reply", end_time);
     PrintTimeDiff(start_time, end_time);
     
     if (close(sock) == -1)
