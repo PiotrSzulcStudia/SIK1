@@ -12,7 +12,9 @@
 #include "err.h"
 #include "timer.h"
 
-#define BUFFER_SIZE   1000
+#define BUFFER_SIZE      1000
+#define PORT_LOW_BOUND      0
+#define PORT_UP_BOUND   65535
 
 static const char* usage_error = "Usage: $./czekamnaudp <port>";
 

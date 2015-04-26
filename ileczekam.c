@@ -45,12 +45,9 @@ int main(int argc, char *argv[])
 
 void test_tcp_connection(char *hostname, char *port)
 {
-    int sock;
+    int sock, err;
     struct addrinfo addr_hints;
     struct addrinfo *addr_result;
-  
-    int i, err;
-    ssize_t len, rcv_len;
 
     memset(&addr_hints, 0, sizeof(struct addrinfo));
     addr_hints.ai_family = AF_INET; // IPv4
