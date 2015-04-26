@@ -17,23 +17,23 @@
 static const char* usage_error = "Usage: $./czekamnaudp <port>";
 
 int main(int argc, char *argv[]) {
-    
-    if (argc != 2)
-	fatal(usage_error);
-	
 	int sock;
 	int flags, sflags;
 	unsigned short int port;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
-	uint64_t message;
-    
-	port = (unsigned short int) atoi(argv[1]);
-
 	char buffer[BUFFER_SIZE];
 	socklen_t snda_len, rcva_len;
 	ssize_t len, snd_len;
-
+	uint64_t message;
+	
+	if (argc != 2)
+		fatal(usage_error);
+	
+	int port = atoi(argv[1]);
+	if ( (PORT_LOW_BOUND <= port ) || (port >= PORT_UP_BOUND))
+		fatal("invalid port number");
+	
 	sock = socket(AF_INET, SOCK_DGRAM, 0); // creating IPv4 UDP socket
 	if (sock < 0)
 		syserr("socket");
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
 				syserr("error on datagram from client socket");
 			else {
 				(void) printf("read from socket: %zd bytes: %" PRId64 "\n", len, received_time);
-				sprintf(buffer, "%" PRId64 " %" PRId64"\0", received_time, current_time); // no buffer overflow
+				sprintf(buffer, "%" PRId64 " %" PRId64"\0", htobe64(received_time), htobe64(current_time)); // no buffer overflow
 				(void) fprintf(stderr, "sending to client: %s\n", buffer);
 				sflags = 0;
 				snd_len = sendto(sock, buffer, (size_t) strlen(buffer), sflags,
