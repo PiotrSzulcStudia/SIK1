@@ -15,8 +15,7 @@
 #define ARG_HOSTNAME        2
 #define ARG_PORT            3
 #define BUFFER_SIZE      1000
-#define PORT_LOW_BOUND      0
-#define PORT_UP_BOUND   65535
+
 
 static const char* usage_error = "Usage: $./ileczekam -<connection_type: u, t> <hostname> <port>";
 
@@ -30,7 +29,7 @@ int main(int argc, char *argv[])
 	fatal(usage_error);
     
     int port = atoi(argv[ARG_PORT]);
-    if ( (PORT_LOW_BOUND <= port ) || (port >= PORT_UP_BOUND))
+    if ( (PORT_LOW_BOUND >= port ) || (port >= PORT_UP_BOUND))
 	fatal("invalid port number");
     
     if (strcmp(argv[ARG_CONNECTION], "-u") == 0)

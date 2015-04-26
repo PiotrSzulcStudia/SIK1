@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 		fatal(usage_error);
 	
 	int port = atoi(argv[1]);
-	if ( (PORT_LOW_BOUND <= port ) || (port >= PORT_UP_BOUND))
+	if ( (PORT_LOW_BOUND >= port ) || (port >= PORT_UP_BOUND))
 		fatal("invalid port number");
 	
 	sock = socket(AF_INET, SOCK_DGRAM, 0); // creating IPv4 UDP socket
