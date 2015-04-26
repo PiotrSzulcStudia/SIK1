@@ -15,6 +15,8 @@
 #define ARG_HOSTNAME        2
 #define ARG_PORT            3
 #define BUFFER_SIZE      1000
+#define PORT_LOW_BOUND      0
+#define PORT_UP_BOUND   65535
 
 
 static const char* usage_error = "Usage: $./ileczekam -<connection_type: u, t> <hostname> <port>";
@@ -80,7 +82,7 @@ void test_udp_connection(char *hostname, const int port)
     struct addrinfo addr_hints;
     struct addrinfo *addr_result;
     
-    int i, flags, sflags;
+    int flags, sflags;
     char buffer[BUFFER_SIZE];
     
     size_t len;
