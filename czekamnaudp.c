@@ -21,7 +21,6 @@ static const char* usage_error = "Usage: $./czekamnaudp <port>";
 int main(int argc, char *argv[]) {
 	int sock;
 	int flags, sflags;
-	unsigned short int port;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
 	char buffer[BUFFER_SIZE];
