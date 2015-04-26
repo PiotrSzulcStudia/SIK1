@@ -1,3 +1,4 @@
+/* Piotr Szulc ps347277 */
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -10,29 +11,31 @@
 #include "err.h"
 #include "timer.h"
 
-#define ARG_CONNECTION 1
-#define ARG_HOSTNAME   2
-#define ARG_PORT       3
-#define BUFFER_SIZE 1000
+#define ARG_CONNECTION    1
+#define ARG_HOSTNAME      2
+#define ARG_PORT          3
+#define BUFFER_SIZE    1000
 
-const char* usage_error = "Usage: $./ileczekam -<connection_type: u, t> <hostname> <port>";
+static const char* usage_error = "Usage: $./ileczekam -<connection_type: u, t> <hostname> <port>";
 
+void safe_atoi(char * str);
 void test_tcp_connection(char *hostname, const int port);
 void test_udp_connection(char *hostname, const int port);
 
 int main(int argc, char *argv[])
 {   
-    
-    int i;
-    ssize_t len, rcv_len;
+    int port;
     
     if (argc != 4)
         fatal(usage_error);
+    port = atoi(argv[ARG_PORT]);
     
-    
-    
-    test_udp_connection(argv[2], atoi(argv[3]));
-    
+    if (strcmp(argv[ARG_CONNECTION], "-u") == 0)
+	test_udp_connection(argv[ARG_HOSTNAME], port);
+    else if (strcmp(argv[ARG_CONNECTION], "-t") == 0)
+	test_tcp_connection(argv[ARG_HOSTNAME], port);
+    else
+	fatal(usage_error);
     
     return 0;
 }
@@ -74,6 +77,7 @@ void test_tcp_connection(char *hostname, const int port)
 
 void test_udp_connection(char *hostname, const int port)
 {
+    printf("%d", port);
     int sock;
     struct addrinfo addr_hints;
     struct addrinfo *addr_result;
@@ -115,7 +119,7 @@ void test_udp_connection(char *hostname, const int port)
     rcva_len = (socklen_t) sizeof(my_address);
     
     /* Starting timer */
-    uint64_t start_time = GetTimeStamp());
+    uint64_t start_time = GetTimeStamp();
     uint64_t message = htobe64(start_time);
     
     /* Sending timestamp in 64BE form */

@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <inttypes.h>
+
 #include "timer.h"
 
 uint64_t GetTimeStamp()

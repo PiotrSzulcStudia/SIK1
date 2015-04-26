@@ -1,3 +1,4 @@
+/* Piotr Szulc ps347277 */
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -12,13 +13,8 @@
 #include "timer.h"
 
 #define BUFFER_SIZE   1000
-#define PORT_NUM     10001
 
-uint64_t GetTimeStamp() {
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return tv.tv_sec*(uint64_t)1000000+tv.tv_usec;
-}
+static const char* usage_error = "Usage: $./czekamnaudp <port>";
 
 int main(int argc, char *argv[]) {
 	int sock;
@@ -34,8 +30,6 @@ int main(int argc, char *argv[]) {
 	sock = socket(AF_INET, SOCK_DGRAM, 0); // creating IPv4 UDP socket
 	if (sock < 0)
 		syserr("socket");
-	// after socket() call; we should close(sock) on any execution path;
-	// since all execution paths exit immediately, sock would be closed when program terminates
 
 	server_address.sin_family = AF_INET; // IPv4
 	server_address.sin_addr.s_addr = htonl(INADDR_ANY); // listening on all interfaces
@@ -54,6 +48,9 @@ int main(int argc, char *argv[]) {
 			flags = 0; // we do not request anything special
 			len = recvfrom(sock, &curtime, sizeof(curtime), flags,
 					(struct sockaddr *) &client_address, &rcva_len);
+			
+			int64_t current_time = GetTimeStamp();
+			
 			if (len < 0)
 				syserr("error on datagram from client socket");
 			else {

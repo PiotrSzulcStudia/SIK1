@@ -1,16 +1,13 @@
-TARGET: ileczekam czekamnaudp timer
+TARGET: ileczekam czekamnaudp
 
 CC	= cc
 CFLAGS	= -Wall -O2
 LFLAGS	= -Wall
 
-timer: timer.o
+ileczekam: ileczekam.o timer.o err.o
 	$(CC) $(LFLAGS) $^ -o $@
 
-ileczekam: ileczekam.o err.o
-	$(CC) $(LFLAGS) $^ -o $@
-
-czekamnaudp: czekamnaudp.o err.o
+czekamnaudp: czekamnaudp.o timer.o err.o
 	$(CC) $(LFLAGS) $^ -o $@
 
 .PHONY: clean TARGET
