@@ -14,7 +14,7 @@ uint64_t GetTimeStamp()
 
 void PrintTime(uint64_t t)
 {
-    printf("%" PRId64 " us\n", t);
+    printf("%" PRId64 " ms\n", t);
 }
 
 void PrintTimeDiff(uint64_t t1, uint64_t t2)

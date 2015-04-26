@@ -17,18 +17,11 @@
 static const char* usage_error = "Usage: $./czekamnaudp <port>";
 
 int main(int argc, char *argv[]) {
-    
-    if (argc != 2)
-	fatal(usage_error);
-	
 	int sock;
 	int flags, sflags;
-	unsigned short int port;
 	struct sockaddr_in server_address;
 	struct sockaddr_in client_address;
-	uint64_t message;
-    
-	port = (unsigned short int) atoi(argv[1]);
+	uint64_t curtime;
 
 	char buffer[BUFFER_SIZE];
 	socklen_t snda_len, rcva_len;
@@ -40,7 +33,7 @@ int main(int argc, char *argv[]) {
 
 	server_address.sin_family = AF_INET; // IPv4
 	server_address.sin_addr.s_addr = htonl(INADDR_ANY); // listening on all interfaces
-	server_address.sin_port = htons(port); // default port for receiving is PORT_NUM
+	server_address.sin_port = htons(PORT_NUM); // default port for receiving is PORT_NUM
 
 	// bind the socket to a concrete address
 	if (bind(sock, (struct sockaddr *) &server_address,
@@ -53,23 +46,22 @@ int main(int argc, char *argv[]) {
 		        
 			rcva_len = (socklen_t) sizeof(client_address);
 			flags = 0; // we do not request anything special
-			len = recvfrom(sock, &message, sizeof(message), flags,
+			len = recvfrom(sock, &curtime, sizeof(curtime), flags,
 					(struct sockaddr *) &client_address, &rcva_len);
+			
 			int64_t current_time = GetTimeStamp();
-			int64_t recieved_time = be64toh(message);
-			sprintf(buffer, "%" PRId64 " %" PRId64"\0", recieved_time, current_time);
+			
 			if (len < 0)
 				syserr("error on datagram from client socket");
 			else {
-				(void) printf("%" PRId64 "\n", be64toh(message));
+				(void) printf("%" PRId64 "\n", be64toh(curtime));
 				(void) printf("read from socket: %zd bytes: %.*s\n", len,
 						(int) len, buffer);
 				
-				printf("%s\n", buffer);
 				sflags = 0;
-				snd_len = sendto(sock, buffer, (size_t) strlen(buffer), sflags,
+				snd_len = sendto(sock, buffer, (size_t) len, sflags,
 						(struct sockaddr *) &client_address, snda_len);
-				if (snd_len != strlen(buffer))
+				if (snd_len != len)
 					syserr("error on sending datagram to client socket");
 			}
 		} while (len > 0);
