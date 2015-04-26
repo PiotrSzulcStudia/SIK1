@@ -1,9 +1,11 @@
-TARGET: ileczekam czekamnaudp
+TARGET: ileczekam czekamnaudp timer
 
 CC	= cc
 CFLAGS	= -Wall -O2
 LFLAGS	= -Wall
 
+timer: timer.o
+	$(CC) $(LFLAGS) $^ -o $@
 
 ileczekam: ileczekam.o err.o
 	$(CC) $(LFLAGS) $^ -o $@

@@ -1,26 +1,18 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <time.h>
-#include <inttypes.h>
+#include "timer.h"
 
-int64_t timespecDiff(struct timespec *timeA_p, struct timespec *timeB_p)
+uint64_t GetTimeStamp()
 {
-  return ((timeA_p->tv_sec * 1000000000) + timeA_p->tv_nsec) -
-           ((timeB_p->tv_sec * 1000000000) + timeB_p->tv_nsec);
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    return tv.tv_sec*(uint64_t)1000000+tv.tv_usec;
 }
 
-int main(int argc, char **argv)
+void PrintTime(uint64_t t)
 {
-  struct timespec start, end;
-  clock_gettime(CLOCK_MONOTONIC, &start);
+    printf("%" PRId64 " ms\n", t);
+}
 
-  // Some code I am interested in measuring
-  int i = 0;
-  for ( i = 0; i <= 1000; i++)
-    printf("a");
-
-  clock_gettime(CLOCK_MONOTONIC, &end);
-
-  uint64_t timeElapsed = timespecDiff(&end, &start);
-  printf("\n %" PRId64 "ms\n", timeElapsed);
+void PrintTimeDiff(uint64_t t1, uint64_t t2)
+{
+    printf("Time difference: %" PRId64 " ms\n", t2 - t1);
 }

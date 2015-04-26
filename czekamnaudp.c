@@ -9,6 +9,7 @@
 #include <time.h>
 
 #include "err.h"
+#include "timer.h"
 
 #define BUFFER_SIZE   1000
 #define PORT_NUM     10001
@@ -56,8 +57,7 @@ int main(int argc, char *argv[]) {
 			if (len < 0)
 				syserr("error on datagram from client socket");
 			else {
-				(void) printf("%" PRId64 "\n", curtime);
-				//(void) printf("%" PRId64 "\n", be64toh(curtime));
+				(void) printf("%" PRId64 "\n", be64toh(curtime));
 				(void) printf("read from socket: %zd bytes: %.*s\n", len,
 						(int) len, buffer);
 				

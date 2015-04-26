@@ -5,28 +5,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <assert.h>
 #include <inttypes.h>
 
 #include "err.h"
-
-#define _DEBUG 1
-#define BUFFER_SIZE 1000
+#include "timer.h"
 
 #define ARG_CONNECTION 1
 #define ARG_HOSTNAME   2
 #define ARG_PORT       3
+#define BUFFER_SIZE 1000
 
 const char* usage_error = "Usage: $./ileczekam -<connection_type: u, t> <hostname> <port>";
 
 void test_tcp_connection(char *hostname, const int port);
 void test_udp_connection(char *hostname, const int port);
-
-uint64_t GetTimeStamp() {
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return tv.tv_sec*(uint64_t)1000000+tv.tv_usec;
-}
 
 int main(int argc, char *argv[])
 {   
@@ -45,6 +37,41 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+void test_tcp_connection(char *hostname, const int port)
+{
+    int sock;
+    struct addrinfo addr_hints;
+    struct addrinfo *addr_result;
+  
+    int i, err;
+    ssize_t len, rcv_len;
+
+    memset(&addr_hints, 0, sizeof(struct addrinfo));
+    addr_hints.ai_family = AF_INET; // IPv4
+    addr_hints.ai_socktype = SOCK_STREAM;
+    addr_hints.ai_protocol = IPPROTO_TCP;
+    err = getaddrinfo(hostname, port, &addr_hints, &addr_result);
+    if (err != 0)
+	syserr("getaddrinfo: %s\n", gai_strerror(err));
+  
+    sock = socket(addr_result->ai_family, addr_result->ai_socktype, addr_result->ai_protocol);
+    if (sock < 0)
+	syserr("socket");
+  
+    /* Starting timer before trying to connect */
+    uint64_t start_time = GetTimeStamp();
+    
+    if (connect(sock, addr_result->ai_addr, addr_result->ai_addrlen) < 0)
+	syserr("connect");
+  
+    /* Stoping timer after establishing connection */
+    uint64_t end_time = GetTimeStamp();
+    PrintTimeDiff(start_time, end_time);
+  
+    freeaddrinfo(addr_result);
+    (void) close(sock);
+}
+
 void test_udp_connection(char *hostname, const int port)
 {
     int sock;
@@ -54,16 +81,12 @@ void test_udp_connection(char *hostname, const int port)
     int i, flags, sflags;
     char buffer[BUFFER_SIZE];
     
-    
-    /* hello */
-    
     size_t len;
     ssize_t snd_len, rcv_len;
     struct sockaddr_in my_address;
     struct sockaddr_in srvr_address;
     socklen_t rcva_len;
     
-    /* converting host/port in string to struct addrinfo */
     (void) memset(&addr_hints, 0, sizeof(struct addrinfo));
     addr_hints.ai_family = AF_INET; // IPv4
     addr_hints.ai_socktype = SOCK_DGRAM;
@@ -73,10 +96,9 @@ void test_udp_connection(char *hostname, const int port)
     addr_hints.ai_addr = NULL;
     addr_hints.ai_canonname = NULL;
     addr_hints.ai_next = NULL;
+    
     if (getaddrinfo(hostname, NULL, &addr_hints, &addr_result) != 0)
-    {
 	syserr("getaddrinfo");
-    }
     
     my_address.sin_family = AF_INET; // IPv4
     my_address.sin_addr.s_addr =
@@ -89,20 +111,17 @@ void test_udp_connection(char *hostname, const int port)
     if (sock < 0)
 	syserr("socket");
     
-    /* code */
     sflags = 0;
     rcva_len = (socklen_t) sizeof(my_address);
     
-    printf("%" PRId64 "\n", GetTimeStamp());
-    printf("%d\n", sizeof(uint64_t));
+    /* Starting timer */
+    uint64_t start_time = GetTimeStamp());
+    uint64_t message = htobe64(start_time);
     
-    uint64_t curtime = GetTimeStamp();
-    //uint64_t curtime = htobe64(GetTimeStamp());
-    //GetTimeStamp();
-    snd_len = sendto(sock, &curtime, sizeof(uint64_t), sflags, (struct sockaddr *) &my_address, rcva_len);
-    if (snd_len != (ssize_t) sizeof(uint64_t)) {
+    /* Sending timestamp in 64BE form */
+    snd_len = sendto(sock, &message, sizeof(uint64_t), sflags, (struct sockaddr *) &my_address, rcva_len);
+    if (snd_len != (ssize_t) sizeof(uint64_t))
       syserr("partial / failed write");
-    }
     
     (void) memset(buffer, 0, sizeof(buffer));
     flags = 0;
@@ -111,14 +130,16 @@ void test_udp_connection(char *hostname, const int port)
     rcv_len = recvfrom(sock, buffer, len, flags,
         (struct sockaddr *) &srvr_address, &rcva_len);
 
-    if (rcv_len < 0) {
-      syserr("read");
-    }
-    (void) printf("read from socket: %zd bytes: %s\n", rcv_len, buffer);
+    /* Stoping timer */
+    uint64_t end_time = GetTimeStamp();
+
+    if (rcv_len < 0)
+	syserr("read");
     
-    
+    (void) printf("read from socket: %zd bytes\n", rcv_len);
+    (void) fprintf(stderr, "read from socket: %zd bytes: %s\n", rcv_len, buffer);
+    PrintTimeDiff(start_time, end_time);
     
     if (close(sock) == -1)
 	syserr("close");
-    
 }
